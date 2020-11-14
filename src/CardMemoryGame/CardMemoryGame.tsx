@@ -17,8 +17,7 @@ const CardMemoryGame = () => {
   const [winner, setWinner] = useState(false);
   const [Area, setArea] = useState('');
   const [disableAll, setDisableAll] = useState(false);
-  const [start, setStart]= useState(false);
-  const [showStart, setShowStart]= useState(true);
+  const [start, setStart]= useState(2);
   const [count, setCount]= useState(0);
   const [timer, setTimer]=useState(0);
   const [startTimer, setStartTimer]=useState(false);
@@ -44,14 +43,13 @@ const CardMemoryGame = () => {
     const index =  cards.findIndex(element => element === card);
     copyCards[index].show= !copyCards[index].show;
     setCards(copyCards);
+    setCount(count+1);
+    
     const done = cards.filter(element => element.show);
-
     if (done.length === cards.length) {
       setWinner(true);
     } 
-
-    setCount(count+1);
-
+    
     if (!firstCard) {
       setFirstCard(card);
     } else if (firstCard.image !== card.image) {
@@ -72,8 +70,9 @@ const CardMemoryGame = () => {
   };
  
   const setGame = (size:number, areaSize:string)=>{
+
+    setArea(areaSize);
     setTimeout(() => {
-      setArea(areaSize);
       const sameElemenets: number = Math.floor((size*size/2));
       const arrToUse:State[]= [];
       for (let i=0; i<sameElemenets; i++){
@@ -94,24 +93,22 @@ const CardMemoryGame = () => {
       }
       arrToUse.sort((a, b) => a.orderNumber- b.orderNumber);
       setCards(arrToUse);
-      setStart(false);
-      setShowStart(false);
       setCount(0);
-      setTimer(0);
+      setStart(0);
+      setTimer(-3);
       setStartTimer(true);
-    // console.log(arrToUse);
-    }, 500);
+    }, 300);
   };
 
   const startGameHandler = () => {
-    setStart(true);
+    setStart(1);
     const arrToUse:State[]= [];
     setCards(arrToUse);
     setFirstCard(undefined);
     setArea('');
     setWinner(false);
     setStartTimer(false);
-    setTimer(0);
+
   };
 
   const convertCounter = (time:number) => {
@@ -126,26 +123,26 @@ const CardMemoryGame = () => {
   return (
     <div className="container">
       <header className="header">
-        <div className="row">
+        <div className="row middle-xs">
           <div className="col-xs-4">
             <div className="button__start-wrapper">
-              <button type="button" className="button__start" onClick={() => startGameHandler()}>{showStart? 'START GAME' : 'PLAY AGAIN'}</button>
+              <button type="button" className="button__start" onClick={() => startGameHandler()}>{!start? 'PLAY AGAIN' : 'START GAME'}</button>
             </div>
             
           </div>
           <div className="col-xs-6">
-            {start && (
+            {start === 1 && (
               <div className="button__option-wrapper">
                 <button type="button" className="button__option" onClick={() => setGame(4, 'small')}>4x4 spēle</button>
                 <button type="button" className="button__option" onClick={() => setGame(6, 'medium')}>6x6 spēle</button>
                 <button type="button" className="button__option" onClick={() => setGame(10, 'large')}>10x10 spēle</button>
               </div>
             ) }
-            {!showStart && 
+            {(start === 0) && 
            (
              <div className="button__option-wrapper">
                <div className='count'>steps: {count > 0 && count}</div>
-               <div className='time'>time: {timer> 0 && convertCounter(timer)}</div>
+               <div className='time'>time: {timer > 0 && convertCounter(timer)}</div>
              </div>
            )}
           </div>
@@ -176,9 +173,23 @@ const CardMemoryGame = () => {
               </>
             ):
             (
-              <div key={card.id} className={`card__back ${Area==='medium' && 'card__back--medium'} ${Area==='large' && 'card__back--large'}`}>
-                <button type="button" className='card__back-button' disabled={disableAll} onClick={()=>changeToName(card)}>+</button>
-              </div>
+              <>
+             
+                     
+                <div key={card.id} className={`card__back ${Area==='medium' && 'card__back--medium'} ${Area==='large' && 'card__back--large'}`}>
+                  <button type="button" className='card__back-button' disabled={disableAll} onClick={()=>changeToName(card)}>+</button>
+                </div>
+               
+               
+                {timer < 0 && 
+                <div className="start-counter-wrapper">
+                  <p className="start-counter">{timer *-1}</p>
+                </div> }
+               
+           
+            
+             
+              </>
             )
      
           ) }
