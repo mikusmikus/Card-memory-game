@@ -1,28 +1,30 @@
-*{
+* {
     box-sizing: border-box;
 }
+
+.header {
+    position: relative;
+    background-color: black;
+    margin-bottom: 30px;
+}
+
 .button__start-wrapper {
-    position: fixed;
     width: 100%;
-    left: 0;
-    top: 0;
-    height: 110px;
-    /* display: block; */
-    background-color: rgb(255, 255, 255);
-    /* text-align: center; */
     display: flex;
-    justify-content: center;
-    z-index: 3;
+    justify-content: flex-start;
 }
 
 .button__start {
-    padding: 30px 50px;
+    padding: 30px 20px;
+    width: 100%;
     background-color: rgb(0, 0, 0);
     color: white;
     font-weight: 700;
     cursor: pointer;
     font-size: 40px;
     transition: opacity 0.2s;
+    border: none;
+    text-align: left;
 }
 
 .button__start:hover {
@@ -30,104 +32,204 @@
 }
 
 .button__option-wrapper {
-    margin-top: 130px;
     display: flex;
     width: 100%;
-    justify-content: center;
+    justify-content: space-evenly;
+    height: 100%;
+    align-items: center;
 }
-.button__option{
+
+.button__option {
     width: 100%;
     padding: 5px 20px;
     font-size: 25px;
     background-color: black;
-    color:white;
+    color: white;
     cursor: pointer;
     transition: opacity 0.2;
+    border: none;
 }
-.button__option:hover{
+
+.button__option:hover {
     opacity: 0.8;
 }
 
+.records-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-.card{
+.records {
+    color: white;
+    font-size: 20px;
+}
+
+.count {
+    width: 50%;
+    color: white;
+    font-size: 33px;
+}
+
+.time {
+    padding: 5px 20px;
+    width: 50%;
+    color: white;
+    font-size: 33px;
+}
+
+.card {
+    position: relative;
     display: flex;
     width: 100%;
-    flex-wrap:wrap
-
+    flex-wrap: wrap
 }
 
 .card__front {
-    flex-basis:25%;
+    flex-basis: 25%;
     position: relative;
     width: 100%;
     height: 150px;
+    overflow: hidden;  
+    padding-top: 25%;
+    background-color: rgb(75, 75, 75);
+    /* border: 1px solid black; */
+}
+
+.card__back {
+    flex-basis: 25%;
     overflow: hidden;
 }
 
-
-.card__back {
-    flex-basis:25%;
-  
-}
-
-
-
-
-.card__image {
+.card__front-image {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
+    z-index: 2;
 }
 
-.card__backSide {
+.loader {
+    position: absolute;
+    border: 9px solid #adabab;
+    border-radius: 50%;
+    left: 22%;
+    top: 22%;
+    border-top: 9px solid #3d3d3d;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    30% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.card__back-button {
     width: 100%;
     height: 150px;
     background-color: rgb(75, 75, 75);
     cursor: pointer;
     overflow: hidden;
-    color:rgb(75, 75, 75);
+    color: rgb(75, 75, 75);
     font-size: 20px;
     font-weight: 700;
     border: 1px solid black;
 }
-.heading{
+
+.heading {
     text-align: center;
     background-color: rgb(255, 255, 255);
-    color:white;
+    color: white;
     font-size: 40px;
     height: 50px;
     margin: 5px 0;
 }
-.heading-show{
-background-color: black;
+
+.heading-show {
+    background-color: black;
 }
 
 .game {
     width: 600px;
-    margin-top: 50px;
     background-color: rgb(75, 75, 75);
 }
 
 .medium {
-    width:900px;
+    width: 900px;
 }
-.card__front--medium{
-    flex-basis:16.66666%
+
+.card__front--medium {
+    flex-basis: 16.66666%;
+    padding-top: 16.66666%;
 }
-.card__back--medium{
-    flex-basis:16.66666%
+
+.card__back--medium {
+    flex-basis: 16.66666%
 }
 
 .large {
-    width:1000px;
+    width: 1000px;
 }
-.card__front--large{
-    flex-basis:10%;
+
+.card__front--large {
+    flex-basis: 10%;
     height: 100px;
+    padding-top: 10%;
 }
-.card__back--large{
-    flex-basis:10%;
+.card__front--large .loader{
+    border: 6px solid #adabab;
+    border-top: 9px solid #3d3d3d;
+    left: 25%;
+    top: 25%;
+    width: 50px;
+    height: 50px;
+ 
+}
+.card__back--large {
+    flex-basis: 10%;
     height: 100px;
+
+}
+
+.winner-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0, 0.4);
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    z-index: 99;
+}
+
+.winner {
+    margin: auto 0;
+    font-size: 55px;
+    animation: blinkingText 1.2s infinite;
+    padding: 30px;
+}
+
+@keyframes blinkingText {
+    0% {
+        color: rgb(255, 255, 255);
+    }
+    50% {
+        color: rgb(211, 141, 141);
+    }
+    100% {
+        color: rgb(255, 255, 255);
+    }
 }
