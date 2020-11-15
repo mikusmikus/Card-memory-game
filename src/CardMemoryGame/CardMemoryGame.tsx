@@ -15,6 +15,7 @@ const CardMemoryGame = () => {
   const [cards, setCards] = useState<State[]>([]);
   const [firstCard, setFirstCard] = useState<State | undefined>();
   const [winner, setWinner] = useState(false);
+  const [records, setRecords] = useState(false);
   const [Area, setArea] = useState('');
   const [disableAll, setDisableAll] = useState(false);
   const [start, setStart]= useState(2);
@@ -122,20 +123,23 @@ const CardMemoryGame = () => {
 
   return (
     <div className="container">
+      <div className={`records-wrapper ${records && 'active'} `}>
+        <div className={`records ${records && 'active'} `} />
+      </div>
       <header className="header">
         <div className="row middle-xs">
           <div className="col-xs-4">
             <div className="button__start-wrapper">
-              <button type="button" className="button__start" onClick={() => startGameHandler()}>{!start? 'PLAY AGAIN' : 'START GAME'}</button>
+              <button type="button" className="button" onClick={() => startGameHandler()}>{!start? 'PLAY AGAIN' : 'START GAME'}</button>
             </div>
             
           </div>
           <div className="col-xs-6">
             {start === 1 && (
               <div className="button__option-wrapper">
-                <button type="button" className="button__option" onClick={() => setGame(4, 'small')}>4x4 spēle</button>
-                <button type="button" className="button__option" onClick={() => setGame(6, 'medium')}>6x6 spēle</button>
-                <button type="button" className="button__option" onClick={() => setGame(10, 'large')}>10x10 spēle</button>
+                <button type="button" className="button button--option" onClick={() => setGame(4, 'small')}>4x4 easy</button>
+                <button type="button" className="button button--option" onClick={() => setGame(6, 'medium')}>6x6 medium</button>
+                <button type="button" className="button button--option" onClick={() => setGame(10, 'large')}>10x10 hard</button>
               </div>
             ) }
             {(start === 0) && 
@@ -147,9 +151,9 @@ const CardMemoryGame = () => {
            )}
           </div>
           <div className="col-xs-2">
-            <div className='records-wrapper'>
-              <button type='button' className='button__option records'>Records</button>
-            </div>
+            
+            <button type='button' className='button button--option button--record' onClick={()=>setRecords(true)}>Records</button>
+            
           </div>
         </div>
       </header>
@@ -174,21 +178,13 @@ const CardMemoryGame = () => {
             ):
             (
               <>
-             
-                     
                 <div key={card.id} className={`card__back ${Area==='medium' && 'card__back--medium'} ${Area==='large' && 'card__back--large'}`}>
                   <button type="button" className='card__back-button' disabled={disableAll} onClick={()=>changeToName(card)}>+</button>
                 </div>
-               
-               
                 {timer < 0 && 
                 <div className="start-counter-wrapper">
                   <p className="start-counter">{timer *-1}</p>
                 </div> }
-               
-           
-            
-             
               </>
             )
      
