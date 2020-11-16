@@ -1,8 +1,10 @@
 /* eslint-disable max-len */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import 'flexboxgrid';
 import './CardMemoryGame.css';
+import Button from '../components/button/button';
+import ResultTable from '../components/table/table';
 // import Table from '../components/table';
 
 type Card  = {
@@ -74,10 +76,12 @@ const CardMemoryGame = () => {
   const [timer, setTimer]=useState(0);
   const [startTimer, setStartTimer]=useState(false);
   const [inputName, setInputName] = useState('');
+  const inputEl = useRef(null);
   // const isInitialMount = useRef(true);
 
 
   useEffect(() => {
+
     const storageStart = localStorage.getItem('start');
     storageStart && setStart(JSON.parse(storageStart));
     
@@ -105,12 +109,14 @@ const CardMemoryGame = () => {
     if (startTimer) {
       if (winner){
         setTimer(timer);
+        // @ts-ignore
+        inputEl.current.focus();  
       } else {
         localStorage.setItem('timer', JSON.stringify(timer));
         setTimeout(() => setTimer(timer + 1), 1000);
       } 
     }
-  }, [timer, startTimer, winner]);
+  }, [timer, startTimer]);
 
   
   const changeToName = (card:Card) => {
@@ -125,6 +131,7 @@ const CardMemoryGame = () => {
     const done = cards.filter((element: Card) => element.show);
     if (done.length === cards.length) {
       setWinner(true);
+      // setTimer(timer);
     } 
     
     if (!firstCard) {
@@ -194,7 +201,7 @@ const CardMemoryGame = () => {
     setStartTimer(false);
 
   };
-
+  
   const convertCounter = (time:number) => {
     const minutes:number = Math.floor(time / 60);
     const seconds:number = time - minutes * 60;
@@ -270,74 +277,13 @@ const CardMemoryGame = () => {
           <button type='button' className='cancel-button' onClick={()=>setRecords(!records)}>X</button>
           <div className="row ">
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <h5 className='results__heading'>EASY (4x4)</h5>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>name</th>
-                    <th>time</th>
-                    <th>steps</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {easyResults.map(({ name, steps, time, id }, index) =>
-                    <tr key={id} className="statistics">
-                      <td className='statistics__place'> {index+1}. </td>
-                      <td>{name.toUpperCase().substring(0, 12)}</td>
-                      <td>{convertCounter(time)}</td>
-                      <td>{steps}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+              <ResultTable heading='EASY (4x4)' resultArr={easyResults} handleTime={convertCounter} />
             </div>
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <h5 className='results__heading'>MEDIUM (6x6)</h5>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>name</th>
-                    <th>time</th>
-                    <th>steps</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mediumResults.map(({ name, steps, time, id }, index) =>
-                    <tr key={id} className="statistics">
-                      <td className='statistics__place'> {index+1}. </td>
-                      <td>{name.toUpperCase()}</td>
-                      <td>{convertCounter(time)}</td>
-                      <td>{steps}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            
+              <ResultTable heading='MEDIUM (6x6)' resultArr={mediumResults} handleTime={convertCounter} />
             </div>
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <h5 className='results__heading'>HARD (10x10)</h5>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>name</th>
-                    <th>time</th>
-                    <th>steps</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {largeResults.map(({ name, steps, time, id }, index) =>
-                    <tr key={id} className="statistics">
-                      <td className='statistics__place'> {index+1}. </td>
-                      <td>{name.toUpperCase()}</td>
-                      <td>{convertCounter(time)}</td>
-                      <td>{steps}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+              <ResultTable heading='HARD (10x10)' resultArr={largeResults} handleTime={convertCounter} />
             </div>
           </div>
         </div>
@@ -352,9 +298,9 @@ const CardMemoryGame = () => {
           <div className="col-sm-6 col-xs-12 last-xs">
             {start === 1 && (
               <div className="button__option-wrapper">
-                <button type="button" className="button button--option" onClick={() => setGame(4, 'small')}>4x4 easy</button>
-                <button type="button" className="button button--option" onClick={() => setGame(6, 'medium')}>6x6 medium</button>
-                <button type="button" className="button button--option" onClick={() => setGame(10, 'large')}>10x10 hard</button>
+                <Button label='4x4 easy' setGameHandler={() => setGame(4, 'small')} />
+                <Button label='6x6 medium' setGameHandler={() => setGame(6, 'medium')} />
+                <Button label='10x10 hard' setGameHandler={() => setGame(10, 'large')} />
               </div>
             ) }
             {(start === 0) && 
@@ -372,7 +318,6 @@ const CardMemoryGame = () => {
           </div>
         </div>
       </header>
-
       <div className="row center-xs"> 
         <div className={`game ${area==='medium' && 'medium'} ${area==='large' && 'large'}`}>
           <div className="card">
@@ -385,19 +330,6 @@ const CardMemoryGame = () => {
                   <div className='loader' /> 
                   <img src={card.image} alt={card.image} className='card__front-image' />
                 </div>
-                {winner && 
-                <>
-                  <div className="input-wrapper">
-                    <label htmlFor="inputName" className='input__label-wrapper'>
-                      <p className='input__label'>enter your name to save result!</p>
-                      <input type="text" className='input' required onChange={(e)=>setInputName(e.target.value)} />
-                      <button type="button" className="input__button" onClick={()=>saveNewResult()}>save</button>
-                    </label>
-                  </div>
-                  <div className="winner-wrapper" key={card.id}> 
-                    <h2 className="winner">You are the winner!!! Your time is {convertCounter(timer)} and you made {count} steps</h2>
-                  </div>
-                </>}
               </>
             ):
             (
@@ -411,8 +343,21 @@ const CardMemoryGame = () => {
                 </div> }
               </>
             )
-     
-          ) }
+          )}
+            {winner && 
+            <>
+              <label htmlFor="inputName" className='input__label-wrapper'>
+                <p className='input__label'>enter your name to save result!</p>
+                <div className='input-wrapper'>
+                  <input type="text" className='input' onChange={(e)=>setInputName(e.target.value)} ref={inputEl} />
+                  <button type="button" className="input__button" onClick={()=>saveNewResult()}>save</button>
+                </div>
+              </label>
+              <div className="winner-wrapper"> 
+                <h2 className="winner">You are the winner!!! Your time is {convertCounter(timer)} and you made {count} steps</h2>
+              </div>
+            </>}
+
           </div>
      
         </div>
@@ -421,6 +366,5 @@ const CardMemoryGame = () => {
 
   );
 };
-
 
 export default CardMemoryGame;
