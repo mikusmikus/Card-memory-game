@@ -5,9 +5,10 @@ import 'flexboxgrid';
 import './CardMemoryGame.css';
 import Button from '../components/button/button';
 import ResultTable from '../components/table/table';
-// import Table from '../components/table';
+import CardFront from '../components/cards/card-front';
+import CardBack from '../components/cards/cards-back';
 
-type Card  = {
+export type Card  = {
   id: string;
   image: string;
   show: boolean;
@@ -255,18 +256,13 @@ const CardMemoryGame = () => {
       }
       setInputName('');
       setArea('');
-  
+      setWinner(false);
     } else {
-      alert('enter name');
+      alert('enter your name to save result');
     }
   
   };
 
-
-
-  const showResults = () => {
-    setRecords(true);
-  };
 
 
   return (
@@ -274,7 +270,7 @@ const CardMemoryGame = () => {
       {/* onClick={()=>setRecords(false)} aria-hidden="true" */} 
       <div className={`records-wrapper ${records && 'active'} `}>
         <div className={`records ${records && 'active'} `}>
-          <button type='button' className='cancel-button' onClick={()=>setRecords(!records)}>X</button>
+          <button type='button' className='cancel-button' onClick={()=>setRecords(false)}>X</button>
           <div className="row ">
             <div className="col-lg-4 col-md-6 col-xs-12">
               <ResultTable heading='EASY (4x4)' resultArr={easyResults} handleTime={convertCounter} />
@@ -313,7 +309,7 @@ const CardMemoryGame = () => {
           </div>
           <div className=" col-sm-2 col-xs-3 last-sm">
             
-            <button type='button' className='button button--option button--record' onClick={()=>showResults()}>Results</button>
+            <button type='button' className='button button--option button--record' onClick={()=>setRecords(true)}>Results</button>
             
           </div>
         </div>
@@ -322,26 +318,12 @@ const CardMemoryGame = () => {
         <div className={`game ${area==='medium' && 'medium'} ${area==='large' && 'large'}`}>
           <div className="card">
             {area && 
-
           cards.map((card: Card) => card.show ?
             (
-              <>
-                <div key={card.id} className={`card__front  ${area==='medium' && 'card__front--medium'}  ${area==='large' && 'card__front--large'}`}> 
-                  <div className='loader' /> 
-                  <img src={card.image} alt={card.image} className='card__front-image' />
-                </div>
-              </>
+              <CardFront area={area} card={card} />
             ):
             (
-              <>
-                <div key={card.id} className={`card__back ${area==='medium' && 'card__back--medium'} ${area==='large' && 'card__back--large'}`}>
-                  <button type="button" className='card__back-button' disabled={disableAll} onClick={()=>changeToName(card)}>+</button>
-                </div>
-                {timer < 0 && 
-                <div className="start-counter-wrapper">
-                  <p className="start-counter">{timer *-1}</p>
-                </div> }
-              </>
+              <CardBack area={area} card={card} disableAll={disableAll} timer={timer} changeToName={()=>changeToName(card)} />
             )
           )}
             {winner && 
