@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import 'flexboxgrid';
 import './CardMemoryGame.css';
+// import Table from '../components/table';
 
 type Card  = {
   id: string;
@@ -13,41 +14,24 @@ type Card  = {
 
 
 
-// const easyResult = [
-//   { 
-//     id:  uuidv4(),
-//     name : 'toms',
-//     steps:22,
-//     time: 45, 
-//   },
-//   { id:  uuidv4(),
-//     name : 'peter',
-//     steps:44,
-//     time: 77, 
-//   },  
-//   { id:  uuidv4(),
-//     name : 'johnm',
-//     steps:44,
-//     time: 2, 
-//   }
-// ];
 
 const mediumResult = [
+  { id:  uuidv4(),
+    name : 'john',
+    steps:99,
+    time: 223, 
+  },
   { id: uuidv4(),
-    name : 'toms',
+    name : 'tomstoms',
     steps:55,
-    time: 45, 
+    time: 245, 
   },
   { id:  uuidv4(),
     name : 'peter',
     steps:99,
-    time: 77, 
+    time: 377, 
   },
-  { id:  uuidv4(),
-    name : 'john',
-    steps:99,
-    time: 23, 
-  }
+
 ];
   
 const largeResult = [
@@ -55,17 +39,17 @@ const largeResult = [
     id:  uuidv4(),
     name : 'toms',
     steps:134,
-    time: 45, 
+    time: 445, 
   },
   { 
     id: uuidv4(),
     name : 'peter',
     steps:222,
-    time: 77, 
+    time: 977, 
   }
 ];
 
-type Result = {
+export type Result = {
   id: string;
   name: string;
   steps: number;
@@ -215,8 +199,12 @@ const CardMemoryGame = () => {
     const minutes:number = Math.floor(time / 60);
     const seconds:number = time - minutes * 60;
     let ret = '';
-    ret += `${  minutes  }:${  seconds < 10 ? '0' : ''}`;
-    ret += `${  seconds}`;
+    if (minutes > 0) {
+      ret += `${  minutes  }m:${  seconds < 10 ? '0' : ''}`;
+      ret += `${  seconds}s`;
+    } else {
+      ret+= `${seconds}sec`;
+    }
     return ret;
   };
 
@@ -280,41 +268,88 @@ const CardMemoryGame = () => {
       <div className={`records-wrapper ${records && 'active'} `}>
         <div className={`records ${records && 'active'} `}>
           <button type='button' className='cancel-button' onClick={()=>setRecords(!records)}>X</button>
-          <div className="row">
-            <div className="col-xs-4">
-              <div className="statistics-wrapper">
-                <h5 style={{ margin : 5 }}>EASY 4x4</h5>
-                <span>name</span>
-                <span>time</span>
-                <span>steps</span>
-                {easyResults.map(({ name, steps, time, id }) =>
-                  <p className="statistics" key={id}>{name.toUpperCase()} time {convertCounter(time)} steps {steps} </p>
-                )}
-              </div>
+          <div className="row ">
+            <div className="col-lg-4 col-md-6 col-xs-12">
+              <h5 className='results__heading'>EASY (4x4)</h5>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>name</th>
+                    <th>time</th>
+                    <th>steps</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {easyResults.map(({ name, steps, time, id }, index) =>
+                    <tr key={id} className="statistics">
+                      <td className='statistics__place'> {index+1}. </td>
+                      <td>{name.toUpperCase().substring(0, 12)}</td>
+                      <td>{convertCounter(time)}</td>
+                      <td>{steps}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="col-xs-4">
-              <h5>MEDIUM</h5>
-              {mediumResults.map(result =>
-                <p key={result.name}>{result.time}</p>
-              )}
+            <div className="col-lg-4 col-md-6 col-xs-12">
+              <h5 className='results__heading'>MEDIUM (6x6)</h5>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>name</th>
+                    <th>time</th>
+                    <th>steps</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mediumResults.map(({ name, steps, time, id }, index) =>
+                    <tr key={id} className="statistics">
+                      <td className='statistics__place'> {index+1}. </td>
+                      <td>{name.toUpperCase()}</td>
+                      <td>{convertCounter(time)}</td>
+                      <td>{steps}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            
             </div>
-            <div className="col-xs-4">
-              <h5>HARD</h5>
-              {largeResults.map(result =>
-                <p key={result.name}>{result.steps}</p>
-              )}
+            <div className="col-lg-4 col-md-6 col-xs-12">
+              <h5 className='results__heading'>HARD (10x10)</h5>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>name</th>
+                    <th>time</th>
+                    <th>steps</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {largeResults.map(({ name, steps, time, id }, index) =>
+                    <tr key={id} className="statistics">
+                      <td className='statistics__place'> {index+1}. </td>
+                      <td>{name.toUpperCase()}</td>
+                      <td>{convertCounter(time)}</td>
+                      <td>{steps}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
       <header className="header">
         <div className="row middle-xs">
-          <div className="col-xs-4">
+          <div className="col-sm-4 col-xs-9">
             <div className="button__start-wrapper">
               <button type="button" className="button" onClick={() => startGameHandler()}>{!start? 'PLAY AGAIN' : 'START GAME'}</button>
             </div>
           </div>
-          <div className="col-xs-6">
+          <div className="col-sm-6 col-xs-12 last-xs">
             {start === 1 && (
               <div className="button__option-wrapper">
                 <button type="button" className="button button--option" onClick={() => setGame(4, 'small')}>4x4 easy</button>
@@ -330,7 +365,7 @@ const CardMemoryGame = () => {
              </div>
            )}
           </div>
-          <div className="col-xs-2">
+          <div className=" col-sm-2 col-xs-3 last-sm">
             
             <button type='button' className='button button--option button--record' onClick={()=>showResults()}>Results</button>
             
