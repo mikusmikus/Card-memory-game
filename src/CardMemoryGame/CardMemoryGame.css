@@ -51,18 +51,20 @@
     opacity: 0.8;
 }
 
-.records-wrapper {
+/* .records-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-}
+} */
 
-.records {
+/* .records {
+    position: relative;
     color: rgb(0, 0, 0);
     font-size: 20px;
-}
+    z-index: 99;
+} */
 
 .count {
     width: 50%;
@@ -84,24 +86,24 @@
     width: 100%;
     flex-wrap: wrap
 }
+.card__back {
+    position: relative;
+    flex-basis: 25%;
+    overflow: hidden;
+    z-index: 2;
+}
 
 .card__front {
     flex-basis: 25%;
     position: relative;
     width: 100%;
     height: 150px;
-    overflow: hidden;  
     padding-top: 25%;
     background-color:rgb(236, 149, 49);
-    /* border: 1px solid black; */
+    /* border: 1px solid black;   */
+    overflow: hidden;
 }
 
-.card__back {
-    position: relative;
-    flex-basis: 25%;
-    overflow: hidden;
-    z-index: 1;
-}
 
 .card__front-image {
     position: absolute;
@@ -109,8 +111,7 @@
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 2;
-
+    z-index: 3;
 }
 
 .loader {
@@ -213,7 +214,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 99;
+    z-index: 4;
 }
 
 .winner {
@@ -253,34 +254,98 @@
     font-size: 300px;
 }
 .button--record{
-    color: black
+    /* position: relative; */
+    color: rgb(255, 255, 255);
+    z-index: 99;
+    font-size: 20px;
 }
 
 .records-wrapper{
-    position: absolute;
+    position: fixed;
+    left: 0;
     top: 0;
-    right: 0;
-    width: 0%;
-    height: 0;
-    transition: width 2s;
-    z-index: 2;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0, 0.8);
+    /* opacity: 0.3; */
+    transform: rotate(0) scale(0) ;
+    border: none;
+    /* max-height: 600px;
+    max-width: 600px; */
+    /* color:rgb(236, 149, 49); */
+    /* background-color: rgb(0, 0, 0); */
+    z-index: 8;
+    transition: 0.5s ease;
 }
 .records-wrapper.active {
-    height: 100%;
-    background-color: rgb(212, 212, 212, 0.3);
-    transition: height 0.5s;
+    position: fixed;
+    transform: rotate(0) scale(1.2);
+    z-index: 888;
 }
 
 .records {
+    position: relative;
+    width: 60%;
+    top:50px;
+    /* min-width: 300px;
+    max-width: 400px; */
+    margin: 10% auto;
+    color: rgb(0, 0, 0, 1);
+    background-color: rgb(236, 149, 49, 1);;
+    text-align: center;
+    padding: 20px;
+    font-size: 25px;
+    z-index: 999;
+}
+
+.cancel-button{
+    
+    position: absolute;
+    right: 0;
+    top: 0;
+  background-color: black;
+  color: white;
+  font-size: 30px;
+  padding: 5;
+  border: none;
+  transition: opacity 0.2s;
+}
+.cancel-button:hover{
+    opacity: 0.8
+}
+.statistics{
+   background-color: black;
+   color: white;
+   margin: 3px 0;
+   padding: 0;
+}
+
+.input__label-wrapper{
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0%;
     width: 100%;
-    height: 0;
-    transition: width 2s;
-    background-color: rgb(236, 149, 49, 0.7);
-    z-index: 1;
+    height: 50px;
+    z-index: 1000;
 }
-.records.active {
-    height: 40%;
+.input__label{
+    color:white;
+    margin-bottom:0;
+    font-size: 30px;
+    letter-spacing: 3px;
 }
+.input{
+    padding: 10px 20px;
+    border: none;
+}
+.input__button{
+    height: 100%;
+    /* padding: 10px 20px; */
+    font-size: 25px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+/* 
+signIn.style.transform = 'rotate(360deg) scale(1.2) translateY(-80%) translateX(-45%)'; */

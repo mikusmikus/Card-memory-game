@@ -1,52 +1,144 @@
 /* eslint-disable max-len */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import 'flexboxgrid';
 import './CardMemoryGame.css';
 
-interface State {
+type Card  = {
   id: string;
   image: string;
   show: boolean;
   orderNumber:number;
-}   
+};   
+
+
+
+// const easyResult = [
+//   { 
+//     id:  uuidv4(),
+//     name : 'toms',
+//     steps:22,
+//     time: 45, 
+//   },
+//   { id:  uuidv4(),
+//     name : 'peter',
+//     steps:44,
+//     time: 77, 
+//   },  
+//   { id:  uuidv4(),
+//     name : 'johnm',
+//     steps:44,
+//     time: 2, 
+//   }
+// ];
+
+const mediumResult = [
+  { id: uuidv4(),
+    name : 'toms',
+    steps:55,
+    time: 45, 
+  },
+  { id:  uuidv4(),
+    name : 'peter',
+    steps:99,
+    time: 77, 
+  },
+  { id:  uuidv4(),
+    name : 'john',
+    steps:99,
+    time: 23, 
+  }
+];
+  
+const largeResult = [
+  {
+    id:  uuidv4(),
+    name : 'toms',
+    steps:134,
+    time: 45, 
+  },
+  { 
+    id: uuidv4(),
+    name : 'peter',
+    steps:222,
+    time: 77, 
+  }
+];
+
+type Result = {
+  id: string;
+  name: string;
+  steps: number;
+  time:number;
+};
+
 
 const CardMemoryGame = () => {
-  const [cards, setCards] = useState<State[]>([]);
-  const [firstCard, setFirstCard] = useState<State | undefined>();
+
+
+  const [cards, setCards] = useState<Card[]>([]);
+  const [easyResults, setEasyResults] = useState<Result[]>([]);
+  const [mediumResults, setMediumResults] = useState<Result[]>(mediumResult);
+  const [largeResults, setLargeResults] = useState<Result[]>(largeResult);
+  const [firstCard, setFirstCard] = useState<Card | undefined>();
   const [winner, setWinner] = useState(false);
   const [records, setRecords] = useState(false);
-  const [Area, setArea] = useState('');
+  const [area, setArea] = useState('');
   const [disableAll, setDisableAll] = useState(false);
   const [start, setStart]= useState(2);
   const [count, setCount]= useState(0);
   const [timer, setTimer]=useState(0);
   const [startTimer, setStartTimer]=useState(false);
-  const isInitialMount = useRef(true);
+  const [inputName, setInputName] = useState('');
+  // const isInitialMount = useRef(true);
 
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    }  
+    const storageStart = localStorage.getItem('start');
+    storageStart && setStart(JSON.parse(storageStart));
+    
+    const storageCount = localStorage.getItem('count');
+    storageCount && setCount(JSON.parse(storageCount));
+
+    const storageTimer = localStorage.getItem('timer');
+    storageTimer && setTimer(JSON.parse(storageTimer));
+
+    const storageCards = localStorage.getItem('cards');
+    storageCards && setCards(JSON.parse(storageCards));
+
+    const storageArea= localStorage.getItem('area');
+    storageArea && setArea(JSON.parse(storageArea));
+
+    const storageStartTimer= localStorage.getItem('startTimer');
+    storageStartTimer && setStartTimer(JSON.parse(storageStartTimer));
+
+    const storageEasyResults= localStorage.getItem('easyResults');
+    storageEasyResults && setEasyResults(JSON.parse(storageEasyResults));
+
+  }, []);
+
+  useEffect(() => {
     if (startTimer) {
-      if (!winner){
-        setTimeout(() => setTimer(timer + 1), 1000);
-      } else {
+      if (winner){
         setTimer(timer);
+      } else {
+        localStorage.setItem('timer', JSON.stringify(timer));
+        setTimeout(() => setTimer(timer + 1), 1000);
       } 
     }
-  }, [timer, startTimer]);
+  }, [timer, startTimer, winner]);
 
-
-  const changeToName = (card:State) => {
+  
+  const changeToName = (card:Card) => {
     const copyCards = [...cards];
-    const index =  cards.findIndex(element => element === card);
+    const index =  cards.findIndex((element: Card) => element === card);
     copyCards[index].show= !copyCards[index].show;
+    localStorage.setItem('cards', JSON.stringify(cards));
     setCards(copyCards);
+    localStorage.setItem('count', JSON.stringify(count+1));
     setCount(count+1);
     
-    const done = cards.filter(element => element.show);
+    const done = cards.filter((element: Card) => element.show);
     if (done.length === cards.length) {
       setWinner(true);
     } 
@@ -56,8 +148,8 @@ const CardMemoryGame = () => {
     } else if (firstCard.image !== card.image) {
       setDisableAll(true);
       setTimeout(() => {
-        const firstCardIndex =  cards.findIndex(element => element === firstCard);
-        const secondCardIndex =  cards.findIndex(element => element === card);
+        const firstCardIndex =  cards.findIndex((element: Card) => element === firstCard);
+        const secondCardIndex =  cards.findIndex((element: Card) => element === card);
         copyCards[firstCardIndex].show= false;
         copyCards[secondCardIndex].show= false;    
         setCards(copyCards);
@@ -71,20 +163,20 @@ const CardMemoryGame = () => {
   };
  
   const setGame = (size:number, areaSize:string)=>{
-
+    localStorage.setItem('area', JSON.stringify(areaSize));
     setArea(areaSize);
     setTimeout(() => {
       const sameElemenets: number = Math.floor((size*size/2));
-      const arrToUse:State[]= [];
+      const arrToUse:Card[]= [];
       for (let i=0; i<sameElemenets; i++){
-        const newCard:State = {
+        const newCard:Card = {
           id:  uuidv4(),
           image : `https://picsum.photos/id/${i*4}/200/200`,
           show: false,
           orderNumber: Math.floor(Math.random() * 999)
         };
-        const newCard2:State = {
-          id:  uuidv4(),
+        const newCard2:Card = {
+          id:  uuidv4()+1,
           image : `https://picsum.photos/id/${i*4}/200/200`,
           show: false,
           orderNumber: Math.floor(Math.random() * 999)
@@ -94,20 +186,27 @@ const CardMemoryGame = () => {
       }
       arrToUse.sort((a, b) => a.orderNumber- b.orderNumber);
       setCards(arrToUse);
+
+      localStorage.setItem('count', JSON.stringify(0));
       setCount(0);
+      localStorage.setItem('start', JSON.stringify(0));
       setStart(0);
+      localStorage.setItem('timer', JSON.stringify(-3));
       setTimer(-3);
+      localStorage.setItem('startTimer', JSON.stringify(startTimer));
       setStartTimer(true);
     }, 300);
   };
 
   const startGameHandler = () => {
+    localStorage.setItem('start', JSON.stringify(1));
     setStart(1);
-    const arrToUse:State[]= [];
+    const arrToUse:Card[]= [];
     setCards(arrToUse);
     setFirstCard(undefined);
     setArea('');
     setWinner(false);
+    localStorage.setItem('startTimer', JSON.stringify(startTimer));
     setStartTimer(false);
 
   };
@@ -121,10 +220,92 @@ const CardMemoryGame = () => {
     return ret;
   };
 
+  const saveNewResult= () => {
+    if (inputName) {
+      if (area === 'small'){
+        easyResults.push({
+          id: uuidv4(),
+          name: inputName,
+          steps: count,
+          time: timer,
+        });
+        const sortedEasyResults = easyResults.sort((a, b) => {
+          return a.time - b.time;
+        });
+        localStorage.setItem('easyResults', JSON.stringify(sortedEasyResults));
+        setEasyResults(sortedEasyResults);
+      } else if (area === 'medium'){
+        mediumResults.push({
+          id: uuidv4(),
+          name: inputName,
+          steps: count,
+          time: timer,
+        });
+        const sortedMediumResults = mediumResults.sort((a, b) => {
+          return a.time - b.time;
+        });
+        setMediumResults(sortedMediumResults);
+      } else {
+        largeResults.push({
+          id: uuidv4(),
+          name: inputName,
+          steps: count,
+          time: timer,
+        });
+        const sortedLargeResults = largeResults.sort((a, b) => {
+          return a.time - b.time;
+        });
+        setLargeResults(sortedLargeResults);
+        setLargeResults(largeResults);
+      }
+      setInputName('');
+      setArea('');
+  
+    } else {
+      alert('enter name');
+    }
+  
+  };
+
+
+
+  const showResults = () => {
+    setRecords(true);
+  };
+
+
   return (
     <div className="container">
+      {/* onClick={()=>setRecords(false)} aria-hidden="true" */} 
       <div className={`records-wrapper ${records && 'active'} `}>
-        <div className={`records ${records && 'active'} `} />
+        <div className={`records ${records && 'active'} `}>
+          <button type='button' className='cancel-button' onClick={()=>setRecords(!records)}>X</button>
+          <div className="row">
+            <div className="col-xs-4">
+              <div className="statistics-wrapper">
+                <h5 style={{ margin : 5 }}>EASY 4x4</h5>
+                <span>name</span>
+                <span>time</span>
+                <span>steps</span>
+                {easyResults.map(({ name, steps, time, id }) =>
+                  <p className="statistics" key={id}>{name.toUpperCase()} time {convertCounter(time)} steps {steps} </p>
+                )}
+              </div>
+            </div>
+            <div className="col-xs-4">
+              <h5>MEDIUM</h5>
+              {mediumResults.map(result =>
+                <p key={result.name}>{result.time}</p>
+              )}
+            </div>
+            <div className="col-xs-4">
+              <h5>HARD</h5>
+              {largeResults.map(result =>
+                <p key={result.name}>{result.steps}</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
       <header className="header">
         <div className="row middle-xs">
@@ -132,7 +313,6 @@ const CardMemoryGame = () => {
             <div className="button__start-wrapper">
               <button type="button" className="button" onClick={() => startGameHandler()}>{!start? 'PLAY AGAIN' : 'START GAME'}</button>
             </div>
-            
           </div>
           <div className="col-xs-6">
             {start === 1 && (
@@ -152,33 +332,42 @@ const CardMemoryGame = () => {
           </div>
           <div className="col-xs-2">
             
-            <button type='button' className='button button--option button--record' onClick={()=>setRecords(true)}>Records</button>
+            <button type='button' className='button button--option button--record' onClick={()=>showResults()}>Results</button>
             
           </div>
         </div>
       </header>
 
       <div className="row center-xs"> 
-        <div className={`game ${Area==='medium' && 'medium'} ${Area==='large' && 'large'}`}>
+        <div className={`game ${area==='medium' && 'medium'} ${area==='large' && 'large'}`}>
           <div className="card">
-            {Area && 
+            {area && 
 
-          cards.map(card => card.show ?
+          cards.map((card: Card) => card.show ?
             (
               <>
-                <div key={card.id} className={`card__front  ${Area==='medium' && 'card__front--medium'}  ${Area==='large' && 'card__front--large'}`}> 
+                <div key={card.id} className={`card__front  ${area==='medium' && 'card__front--medium'}  ${area==='large' && 'card__front--large'}`}> 
                   <div className='loader' /> 
                   <img src={card.image} alt={card.image} className='card__front-image' />
                 </div>
                 {winner && 
-                <div className="winner-wrapper" key={card.id}> 
-                  <h2 className="winner">You are the winner!!! Your time is {convertCounter(timer)} and you made {count} steps</h2>
-                </div>}
+                <>
+                  <div className="input-wrapper">
+                    <label htmlFor="inputName" className='input__label-wrapper'>
+                      <p className='input__label'>enter your name to save result!</p>
+                      <input type="text" className='input' required onChange={(e)=>setInputName(e.target.value)} />
+                      <button type="button" className="input__button" onClick={()=>saveNewResult()}>save</button>
+                    </label>
+                  </div>
+                  <div className="winner-wrapper" key={card.id}> 
+                    <h2 className="winner">You are the winner!!! Your time is {convertCounter(timer)} and you made {count} steps</h2>
+                  </div>
+                </>}
               </>
             ):
             (
               <>
-                <div key={card.id} className={`card__back ${Area==='medium' && 'card__back--medium'} ${Area==='large' && 'card__back--large'}`}>
+                <div key={card.id} className={`card__back ${area==='medium' && 'card__back--medium'} ${area==='large' && 'card__back--large'}`}>
                   <button type="button" className='card__back-button' disabled={disableAll} onClick={()=>changeToName(card)}>+</button>
                 </div>
                 {timer < 0 && 
