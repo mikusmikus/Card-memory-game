@@ -85,10 +85,9 @@
 .card__front {
     flex-basis: 25%;
     position: relative;
-    width: 100%;
     height: 150px;
     padding-top: 25%;
-    background-color:rgb(236, 149, 49);
+    /* background-color:rgb(236, 149, 49); */
     /* border: 1px solid black;   */
     overflow: hidden;
 }

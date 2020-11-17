@@ -7,6 +7,9 @@ import Button from '../components/button/button';
 import ResultTable from '../components/table/table';
 import CardFront from '../components/cards/card-front';
 import CardBack from '../components/cards/cards-back';
+import Winner from '../components/winner/winner';
+
+
 
 export type Card  = {
   id: string;
@@ -15,8 +18,8 @@ export type Card  = {
   orderNumber:number;
 };   
 
-
-
+let openCards = 0;
+let timeOutId:NodeJS.Timeout;
 
 const mediumResult = [
   { id:  uuidv4(),
@@ -63,15 +66,15 @@ export type Result = {
 const CardMemoryGame = () => {
 
 
+  const [firstCard, setFirstCard] = useState<Card>();
+  const [secondCard, setSecondCard] = useState<Card>();
   const [cards, setCards] = useState<Card[]>([]);
   const [easyResults, setEasyResults] = useState<Result[]>([]);
   const [mediumResults, setMediumResults] = useState<Result[]>(mediumResult);
   const [largeResults, setLargeResults] = useState<Result[]>(largeResult);
-  const [firstCard, setFirstCard] = useState<Card | undefined>();
   const [winner, setWinner] = useState(false);
   const [records, setRecords] = useState(false);
   const [area, setArea] = useState('');
-  const [disableAll, setDisableAll] = useState(false);
   const [start, setStart]= useState(2);
   const [count, setCount]= useState(0);
   const [timer, setTimer]=useState(0);
@@ -83,23 +86,23 @@ const CardMemoryGame = () => {
 
   useEffect(() => {
 
-    const storageStart = localStorage.getItem('start');
-    storageStart && setStart(JSON.parse(storageStart));
+    // const storageStart = localStorage.getItem('start');
+    // storageStart && setStart(JSON.parse(storageStart));
     
-    const storageCount = localStorage.getItem('count');
-    storageCount && setCount(JSON.parse(storageCount));
+    // const storageCount = localStorage.getItem('count');
+    // storageCount && setCount(JSON.parse(storageCount));
 
-    const storageTimer = localStorage.getItem('timer');
-    storageTimer && setTimer(JSON.parse(storageTimer));
+    // const storageTimer = localStorage.getItem('timer');
+    // storageTimer && setTimer(JSON.parse(storageTimer));
 
-    const storageCards = localStorage.getItem('cards');
-    storageCards && setCards(JSON.parse(storageCards));
+    // const storageCards = localStorage.getItem('cards');
+    // storageCards && setCards(JSON.parse(storageCards));
 
     const storageArea= localStorage.getItem('area');
     storageArea && setArea(JSON.parse(storageArea));
 
-    const storageStartTimer= localStorage.getItem('startTimer');
-    storageStartTimer && setStartTimer(JSON.parse(storageStartTimer));
+    // const storageStartTimer= localStorage.getItem('startTimer');
+    // storageStartTimer && setStartTimer(JSON.parse(storageStartTimer));
 
     const storageEasyResults= localStorage.getItem('easyResults');
     storageEasyResults && setEasyResults(JSON.parse(storageEasyResults));
@@ -113,49 +116,69 @@ const CardMemoryGame = () => {
         // @ts-ignore
         inputEl.current.focus();  
       } else {
-        localStorage.setItem('timer', JSON.stringify(timer));
+        // localStorage.setItem('timer', JSON.stringify(timer));
         setTimeout(() => setTimer(timer + 1), 1000);
       } 
     }
   }, [timer, startTimer]);
 
   
-  const changeToName = (card:Card) => {
+
+
+
+  const changeToName = (card:Card, cardIndex:number) => {
     const copyCards = [...cards];
-    const index =  cards.findIndex((element: Card) => element === card);
-    copyCards[index].show= !copyCards[index].show;
-    localStorage.setItem('cards', JSON.stringify(cards));
-    setCards(copyCards);
-    localStorage.setItem('count', JSON.stringify(count+1));
     setCount(count+1);
-    
+    clearTimeout(timeOutId);
+    if (openCards === 2){
+      if (firstCard && secondCard ) {
+        if (firstCard.image !== secondCard.image){
+          const index1 =  cards.findIndex((element: Card) => element === firstCard);
+          copyCards[index1].show=false;
+          const index2 =  cards.findIndex((element: Card) => element === secondCard);
+          copyCards[index2].show=false;
+          setCards(copyCards);
+          openCards = 0;
+        } else {
+          openCards = 0;
+        }
+      }
+    }
+
+    openCards +=1; 
+
+    if (openCards === 1) {
+      setFirstCard(card);
+      copyCards[cardIndex].show=true;
+      setCards(copyCards);
+    } 
+    if (openCards === 2) {
+      setSecondCard(card);
+      copyCards[cardIndex].show=true;
+      setCards(copyCards);
+
+
+      if (firstCard){
+        if (firstCard.image !== card.image){
+          const index1 =  cards.findIndex((element: Card) => element === firstCard);
+          timeOutId = setTimeout(() => {
+            copyCards[index1].show=false;
+            copyCards[cardIndex].show=false;
+            setCards(copyCards); 
+          }, 3000);
+        }
+      }
+    }
+
     const done = cards.filter((element: Card) => element.show);
     if (done.length === cards.length) {
       setWinner(true);
-      // setTimer(timer);
     } 
-    
-    if (!firstCard) {
-      setFirstCard(card);
-    } else if (firstCard.image !== card.image) {
-      setDisableAll(true);
-      setTimeout(() => {
-        const firstCardIndex =  cards.findIndex((element: Card) => element === firstCard);
-        const secondCardIndex =  cards.findIndex((element: Card) => element === card);
-        copyCards[firstCardIndex].show= false;
-        copyCards[secondCardIndex].show= false;    
-        setCards(copyCards);
-        setFirstCard(undefined);
-        setDisableAll(false);
-      }, 1000);
-    } else {
-      setFirstCard(undefined);
-      setCards(copyCards);
-    }
+
   };
  
   const setGame = (size:number, areaSize:string)=>{
-    localStorage.setItem('area', JSON.stringify(areaSize));
+    // localStorage.setItem('area', JSON.stringify(areaSize));
     setArea(areaSize);
     setTimeout(() => {
       const sameElemenets: number = Math.floor((size*size/2));
@@ -179,31 +202,31 @@ const CardMemoryGame = () => {
       arrToUse.sort((a, b) => a.orderNumber- b.orderNumber);
       setCards(arrToUse);
 
-      localStorage.setItem('count', JSON.stringify(0));
+      // localStorage.setItem('count', JSON.stringify(0));
       setCount(0);
-      localStorage.setItem('start', JSON.stringify(0));
+      // localStorage.setItem('start', JSON.stringify(0));
       setStart(0);
-      localStorage.setItem('timer', JSON.stringify(-3));
+      // localStorage.setItem('timer', JSON.stringify(-3));
       setTimer(-3);
-      localStorage.setItem('startTimer', JSON.stringify(startTimer));
+      // localStorage.setItem('startTimer', JSON.stringify(startTimer));
       setStartTimer(true);
     }, 300);
   };
 
   const startGameHandler = () => {
-    localStorage.setItem('start', JSON.stringify(1));
+    // localStorage.setItem('start', JSON.stringify(1));
     setStart(1);
     const arrToUse:Card[]= [];
     setCards(arrToUse);
     setFirstCard(undefined);
     setArea('');
     setWinner(false);
-    localStorage.setItem('startTimer', JSON.stringify(startTimer));
+    // localStorage.setItem('startTimer', JSON.stringify(startTimer));
     setStartTimer(false);
 
   };
   
-  const convertCounter = (time:number) => {
+  const convertTime = (time:number) => {
     const minutes:number = Math.floor(time / 60);
     const seconds:number = time - minutes * 60;
     let ret = '';
@@ -254,16 +277,14 @@ const CardMemoryGame = () => {
         setLargeResults(sortedLargeResults);
         setLargeResults(largeResults);
       }
-      setInputName('');
       setArea('');
       setWinner(false);
+      setInputName('');
     } else {
       alert('enter your name to save result');
     }
   
   };
-
-
 
   return (
     <div className="container">
@@ -273,13 +294,13 @@ const CardMemoryGame = () => {
           <button type='button' className='cancel-button' onClick={()=>setRecords(false)}>X</button>
           <div className="row ">
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <ResultTable heading='EASY (4x4)' resultArr={easyResults} handleTime={convertCounter} />
+              <ResultTable heading='EASY (4x4)' resultArr={easyResults} handleTime={convertTime} />
             </div>
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <ResultTable heading='MEDIUM (6x6)' resultArr={mediumResults} handleTime={convertCounter} />
+              <ResultTable heading='MEDIUM (6x6)' resultArr={mediumResults} handleTime={convertTime} />
             </div>
             <div className="col-lg-4 col-md-6 col-xs-12">
-              <ResultTable heading='HARD (10x10)' resultArr={largeResults} handleTime={convertCounter} />
+              <ResultTable heading='HARD (10x10)' resultArr={largeResults} handleTime={convertTime} />
             </div>
           </div>
         </div>
@@ -303,7 +324,7 @@ const CardMemoryGame = () => {
            (
              <div className="button__option-wrapper">
                <div className='count'>steps: {count > 0 && count}</div>
-               <div className='time'>time: {timer > 0 && convertCounter(timer)}</div>
+               <div className='time'>time: {timer > 0 && convertTime(timer)}</div>
              </div>
            )}
           </div>
@@ -318,28 +339,16 @@ const CardMemoryGame = () => {
         <div className={`game ${area==='medium' && 'medium'} ${area==='large' && 'large'}`}>
           <div className="card">
             {area && 
-          cards.map((card: Card) => card.show ?
+          cards.map((card: Card, index) => card.show ?
             (
               <CardFront area={area} card={card} />
             ):
             (
-              <CardBack area={area} card={card} disableAll={disableAll} timer={timer} changeToName={()=>changeToName(card)} />
+              <CardBack area={area} card={card} timer={timer} changeToName={()=>changeToName(card, index)} />
             )
           )}
             {winner && 
-            <>
-              <label htmlFor="inputName" className='input__label-wrapper'>
-                <p className='input__label'>enter your name to save result!</p>
-                <div className='input-wrapper'>
-                  <input type="text" className='input' onChange={(e)=>setInputName(e.target.value)} ref={inputEl} />
-                  <button type="button" className="input__button" onClick={()=>saveNewResult()}>save</button>
-                </div>
-              </label>
-              <div className="winner-wrapper"> 
-                <h2 className="winner">You are the winner!!! Your time is {convertCounter(timer)} and you made {count} steps</h2>
-              </div>
-            </>}
-
+            <Winner count={count} saveNewResult={()=>saveNewResult()} handleTime={convertTime} timer={timer} myRef={inputEl} inputHandler={(e)=>setInputName(e.target.value)} inputName={inputName} />}
           </div>
      
         </div>
