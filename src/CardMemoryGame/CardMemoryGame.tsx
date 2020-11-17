@@ -283,8 +283,12 @@ const CardMemoryGame = () => {
     } else {
       alert('enter your name to save result');
     }
-  
   };
+
+  const saveInputValue = (value:string) => {
+    setInputName(value);
+  };
+  console.log(inputName);
 
   return (
     <div className="container">
@@ -348,7 +352,7 @@ const CardMemoryGame = () => {
             )
           )}
             {winner && 
-            <Winner count={count} saveNewResult={()=>saveNewResult()} handleTime={convertTime} timer={timer} myRef={inputEl} inputHandler={(e)=>setInputName(e.target.value)} inputName={inputName} />}
+            <Winner count={count} saveNewResult={()=>saveNewResult()} handleTime={convertTime} timer={timer} myRef={inputEl} inputHandler={saveInputValue} inputName={inputName} />}
           </div>
      
         </div>
